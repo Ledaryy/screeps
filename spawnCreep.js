@@ -8,7 +8,7 @@ module.exports = function() {
     const partsForMiner = [6, 4, 2];
     const partsForUpgrader = [6, 4, 2];
     const partsForRepairer = [3, 4, 3];
-    const partsForBuilder = [3, 4, 3];
+    const partsForBuilder = [3, 6, 5];
     const partsForFreighter = [0, 16, 8];
     const partsForBridge = [0, 8, 1];
     const partsForWallRepairer = [3, 4, 3];
@@ -30,6 +30,7 @@ module.exports = function() {
                             role: roleName,
                             home: creepRoom,
                             position: fGetMiningPosition('W1N6'),
+                            carryStorage: 'empty',
                         });
 
                     case 'upgrader':
@@ -81,7 +82,7 @@ module.exports = function() {
                         });
 
                     case 'claimer':
-                        bodyParts = fCreateBody(partsForClaimer[0], partsForClaimer[1], partsForClaimer[2])
+                        bodyParts = fCreateBody(0, 0, 5, 1)
 
                         return this.createCreep(bodyParts, "Claimer - " + Memory.statistics.claimers + " - " + creepRoom, {
                             role: roleName,
@@ -98,11 +99,12 @@ module.exports = function() {
             if (creepRoom === 'W2N6'){
                 switch (roleName) {
                     case 'miner':
-                        bodyParts = fCreateBody(partsForMiner[0], partsForMiner[1], partsForMiner[2])
+                        bodyParts = fCreateBody(3, 5, 5)
                         return this.createCreep(bodyParts, "Miner - " + Memory.statistics.miners + " - " + creepRoom, {
                             role: roleName,
                             home: creepRoom,
-                            position: minerCreepPosition,
+                            position: fGetMiningPosition('W2N6'),
+                            carryStorage: 'empty',
                         });
 
                     case 'upgrader':
@@ -186,12 +188,15 @@ module.exports = function() {
 
     }
 
-    function fCreateBody(fWork, fCarry, fMove) {
+    function fCreateBody(fWork, fCarry, fMove, fClaim) {
 
         let fBodyParts = [];
 
         for (let i = 0; i < fWork; i++) {
             fBodyParts.push(WORK);
+        }
+        for (let i = 0; i < fClaim; i++) {
+            fBodyParts.push(CLAIM);
         }
         for (let i = 0; i < fCarry; i++) {
             fBodyParts.push(CARRY);
@@ -215,45 +220,42 @@ module.exports = function() {
         let W2N6_First = fGetAmountOfCreeps('miner', 'W2N6', 'first');
         let W2N6_Second = fGetAmountOfCreeps('miner', 'W2N6', 'second');
 
-    if (roomName === 'W1N6') {
+        if (roomName === 'W1N6') {
 
-        switch (true) {
-            case W1N6_First === 1 && W1N6_Second === 0:
-                return 'second'
+            switch (true) {
+                case W1N6_First === 1 && W1N6_Second === 0:
+                    return 'second'
 
-            case W1N6_First === 0 && W1N6_Second === 1:
-                return 'first'
+                case W1N6_First === 0 && W1N6_Second === 1:
+                    return 'first'
 
-            case W1N6_First === 0 && W1N6_Second === 0:
-                return 'first';
+                case W1N6_First === 0 && W1N6_Second === 0:
+                    return 'first';
 
-            default:
-                break;
+                default:
+                    break;
 
-        } // Choosing creep for W1N6
-    }
+            } // Choosing creep for W1N6
+        }
+        if (roomName === 'W2N6') {
 
-        /*
-                switch (true) {
-                    case W2N6_First === 1 && W2N6_Second === 0:
-                        minerCreepPosition = 'second';
-                        break;
+            switch (true) {
+                case W2N6_First === 1 && W2N6_Second === 0:
+                    return 'second'
 
-                    case W2N6_First === 0 && W2N6_Second === 1:
-                        minerCreepPosition = 'first';
-                        break;
+                case W2N6_First === 0 && W2N6_Second === 1:
+                    return 'first'
 
-                    case W2N6_First === 0 && W2N6_Second === 0:
-                        minerCreepPosition = 'first';
-                        break;
+                case W2N6_First === 0 && W2N6_Second === 0:
+                    return 'first';
 
-                    default:
-                        break;
+                default:
+                    break;
 
-                } // Choosing creep for W2N6
-            */
+
+            }
+        }
 
     }
-
 // ---------------------------------------------------------------------------------------------------------------------
 };
