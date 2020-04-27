@@ -12,7 +12,7 @@ module.exports.loop = function () {
 
 // ---------------------------------------------------------------------------------------------------------------------
     for (let name in Memory.creeps) {
-        if (Game.creeps[name] == undefined) {
+        if (Game.creeps[name] === undefined) {
             delete Memory.creeps[name];
         }
     } // clearing the memory
@@ -79,11 +79,21 @@ module.exports.loop = function () {
         }
     }
 
+    const towers1 = Game.rooms.W2N6.find(FIND_STRUCTURES, {
+        filter: (s) => s.structureType === STRUCTURE_TOWER
+    });
+    for (let tower of towers1) {
+        var target1 = tower.pos.findClosestByRange(FIND_HOSTILE_CREEPS);
+        if (target1 !== undefined) {
+            tower.attack(target1);
+        }
+    }
+
 // ---------------------------------------------------------------------------------------------------------------------
 // Minimum needed creeps for colony
     const miners = 2;
-    const upgraders = 2;
-    const builders = 0;
+    const upgraders = 1;
+    const builders = 3;
     const repairers = 1;
     const freighters = 1;
     const bridges = 1;
@@ -165,54 +175,43 @@ module.exports.loop = function () {
     }
 
 // Spawning creeps for W2N6 colony
-    /* switch (true) {
 
-         case W2N6_Miners < miners:
-             spawnStatus = Game.spawns.Spawn2.spawnMyCreep('miner', 'W2N6')
-             Memory.statistics.miners += 1;
-             break;
+    switch (true) {
 
-         case W2N6_Upgraders < upgraders:
-             Game.spawns.Spawn2.spawnMyCreep('upgrader', 'W2N6')
-             Memory.statistics.upgraders += 1;
-             break;
+        case W2N6_Miners < miners:
+            spawnStatus = Game.spawns.Spawn1.spawnMyCreep('miner', 'W2N6')
+            Memory.statistics.miners += 1;
+            break;
 
-         case W2N6_Builders < builders:
-             Game.spawns.Spawn2.spawnMyCreep('builder', 'W2N6')
-             Memory.statistics.builers += 1;
-             break;
+        case W2N6_Freighters < freighters:
+            Game.spawns.Spawn1.spawnMyCreep('freighter', 'W2N6')
+            Memory.statistics.freighter += 1;
+            break;
 
-         case W2N6_Repairers < repairers:
-             Game.spawns.Spawn2.spawnMyCreep('repairer', 'W2N6')
-             Memory.statistics.repairers += 1;
-             break;
+        case W2N6_Bridges < 2:
+            Game.spawns.Spawn1.spawnMyCreep('bridge', 'W2N6')
+            Memory.statistics.bridges += 1;
+            break;
 
-         case W2N6_Freighters < freighters:
-             Game.spawns.Spawn2.spawnMyCreep('freighter', 'W2N6')
-             Memory.statistics.freighter += 1;
-             break;
+        case W2N6_Upgraders < 5:
+            Game.spawns.Spawn2.spawnMyCreep('upgrader', 'W2N6')
+            Memory.statistics.upgraders += 1;
+            break;
 
-         case W2N6_Bridges < bridges:
-             Game.spawns.Spawn2.spawnMyCreep('bridge', 'W2N6')
-             Memory.statistics.bridges += 1;
-             break;
+        case W2N6_Repairers < 1:
+            Game.spawns.Spawn2.spawnMyCreep('repairer', 'W2N6')
+            Memory.statistics.repairers += 1;
+            break;
 
-         case W2N6_WallRepairers < wallRepairers:
-             Game.spawns.Spawn2.spawnMyCreep('wallRepairer', 'W2N6')
-             Memory.statistics.wallRepairers += 1;
-             break;
-
-         case W2N6_Claimers < claimers:
-             Game.spawns.Spawn2.spawnMyCreep('claimer', 'W2N6')
-             Memory.statistics.claimers += 1;
-             break;
-
-         default:
-             break;
+        default:
+            break;
 
 
-     }
- */
+    }
+
+
+
+
 
 // ---------------------------------------------------------------------------------------------------------------------
 // Colony links logic
@@ -266,7 +265,7 @@ module.exports.loop = function () {
     Memory.statistics.time += 1;
     console.log('--------------------------------[ ' + Memory.statistics.time + ' ]-----------------------------------')
     console.log('M: ' + W1N6_Miners + ' U: ' + W1N6_Upgraders + ' R: ' + W1N6_Repairers)
-
+        // TODO Make new console log
 
 // ---------------------------------------------------------------------------------------------------------------------
 
