@@ -1,4 +1,4 @@
-
+var roleBuilder = require('role.builder');
 
 module.exports = {
 
@@ -6,6 +6,7 @@ module.exports = {
 
         var creepHome = creep.memory.home
         var creepPosition = creep.room.name;
+        var container = fParsingModule(STRUCTURE_CONTAINER, RESOURCE_ENERGY, "more", -1);
 
 
         switch (true) {
@@ -36,7 +37,7 @@ module.exports = {
                         break;
 
                     case creepPosition === 'W2N6' && creep.memory.carryStorage === 'full':
-                        fUpgradeController()
+                        fTransferEnergy(container);
                         break;
 
                     case creepPosition === 'W2N6' && creep.memory.carryStorage === 'empty':
@@ -56,6 +57,83 @@ module.exports = {
                 break;
         }
 
+        function fParsingModule(structureType, energyType, math, neededValue ) { // math can be "more" "less" "equal"
+            var foundedStructures = creep.room.find(FIND_STRUCTURES, {
+                filter: (s) => s.structureType == structureType
+            });
+            var foundedCorrectStructures = [];
+            var bestPath = [];
+
+            switch (math) {
+                case "more":
+                    if (foundedStructures.length > 0) {
+                        for (let structure of foundedStructures ){
+                            var energyOfStructure = structure.store[energyType];
+                            if (energyOfStructure > neededValue) {
+                                foundedCorrectStructures.push(structure)
+
+                            } // We looking fo structure which have > than neededValue
+                        } // import wants a array of structures
+                        bestPath = creep.pos.findClosestByPath(foundedCorrectStructures);
+                        if (bestPath !== null){
+                            return bestPath;
+                        }
+
+                    }
+
+                    return 0;
+                    break;
+                case "less":
+                    if (foundedStructures.length > 0) {
+                        for (let structure of foundedStructures ){
+                            var energyOfStructure = structure.store[energyType];
+                            if (energyOfStructure < neededValue) {
+                                foundedCorrectStructures.push(structure)
+                            } // We looking fo structure which have > than neededValue
+                        } // import wants a array of structures
+                        bestPath = creep.pos.findClosestByPath(foundedCorrectStructures);
+                        if (bestPath !== null){
+                            return bestPath;
+                        }
+                    }
+
+                    return 0;
+                    break;
+                case "equal":
+                    if (foundedStructures.length > 0) {
+                        for (let structure of foundedStructures ){
+                            var energyOfStructure = structure.store[energyType];
+                            if (energyOfStructure === neededValue) {
+                                foundedCorrectStructures.push(structure)
+
+                            } // We looking fo structure which have > than neededValue
+                        } // import wants a array of structures
+                        bestPath = creep.pos.findClosestByPath(foundedCorrectStructures);
+                        if (bestPath !== null){
+                            return bestPath;
+                        }
+                    }
+
+                    return 0;
+                    break;
+                default:
+                    console.log("Wrong math type!!!");
+                    break;
+            }
+        } // v 1.1
+
+        function fTransferEnergy(fStructure) {
+            var transferring = creep.transfer(fStructure, RESOURCE_ENERGY);
+            switch (transferring) {
+                case ERR_NOT_IN_RANGE:
+                    creep.moveTo(fStructure, {visualizePathStyle: {stroke: '#ff0100'}});
+                    break;
+
+                default:
+
+                    break;
+            }
+        }
 
         function fUpgradeController() {
 
