@@ -13,26 +13,43 @@ module.exports = {
             creepCarryStorage = 'not full'
         }
 
+        var creepHome = creep.memory.home
 
+        var container = fParsingModule(STRUCTURE_CONTAINER, RESOURCE_ENERGY, "more", 10);
         var storage = fParsingModule(STRUCTURE_STORAGE, RESOURCE_ENERGY, "less", 1000000);
        var everything = creep.pos.findClosestByPath(FIND_STRUCTURES, {
            filter: (f) => f.structureType !== STRUCTURE_WALL && f.structureType !== STRUCTURE_RAMPART && f.hits < f.hitsMax
        })
 
 
+        if (creepHome === 'W1N6') {
 
-        switch (true) {
-            case creepCarryStorage === "empty":
-                fWithdrawEnergy(storage);
-                break;
-            case (creepCarryStorage === "full" || creepCarryStorage === "not full"):
-                fRepair(everything);
-                break;
-            default:
-                console.log("Errror in Repairer")
-                break;
+            switch (true) {
+                case creepCarryStorage === "empty":
+                    fWithdrawEnergy(storage);
+                    break;
+                case (creepCarryStorage === "full" || creepCarryStorage === "not full"):
+                    fRepair(everything);
+                    break;
+                default:
+                    console.log("Errror in Repairer")
+                    break;
+            }
         }
 
+        if (creepHome === 'W2N6'){
+            switch (true) {
+                case creepCarryStorage === "empty":
+                    fWithdrawEnergy(container);
+                    break;
+                case (creepCarryStorage === "full" || creepCarryStorage === "not full"):
+                    fRepair(everything);
+                    break;
+                default:
+                    console.log("Errror in Repairer")
+                    break;
+            }
+        }
 
 
 
