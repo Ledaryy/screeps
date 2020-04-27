@@ -6,7 +6,8 @@ module.exports = {
 
 
         var creepCarryStorage = [];
-
+        var creepHome = creep.memory.home
+        var creepPosition = creep.room.name
 
         if (creep.carry.energy === creep.carryCapacity) {
             creepCarryStorage = 'full';
@@ -18,58 +19,97 @@ module.exports = {
 
         var spawn = fParsingModule(STRUCTURE_SPAWN, RESOURCE_ENERGY, "less", 300);
         var extension = fParsingModule(STRUCTURE_EXTENSION, RESOURCE_ENERGY, "less", 100);
+        var extension1 = fParsingModule(STRUCTURE_EXTENSION, RESOURCE_ENERGY, "less", 50);
         var tower = fParsingModule(STRUCTURE_TOWER, RESOURCE_ENERGY, "less", 1000);
         var storage = fParsingModule(STRUCTURE_STORAGE, RESOURCE_ENERGY, "less", 1000000);
         var container = fParsingModule(STRUCTURE_CONTAINER, RESOURCE_ENERGY, "more", 10);
         var droppedResource = creep.pos.findClosestByRange(FIND_DROPPED_RESOURCES);
         var currentTask = [];
 
+switch (true) {
+    case creepPosition === creepHome:
+        if (creepHome === 'W1N6') {
 
+            switch (true) {
+                case creepCarryStorage === "empty" && (tower !== 0 || extension !== 0 || spawn !== 0):
+                    currentTask = "Withdraw energy";
+                    fWithdrawEnergy(storage);
+                    break;
 
-        switch (true) {
-             case creepCarryStorage === "empty" && (tower !== 0 || extension !== 0 || spawn !== 0):
-            currentTask = "Withdraw energy";
-            fWithdrawEnergy(storage);
-            break;
+                case (creepCarryStorage === 'full' || creepCarryStorage === 'not full') && spawn !== 0:
+                    currentTask = "Move e spawn";
+                    fTransferEnergy(spawn);
+                    break;
 
-            case (creepCarryStorage === 'full' || creepCarryStorage === 'not full') && spawn !== 0:
-                currentTask = "Move e spawn";
-                fTransferEnergy(spawn);
-                break;
+                case (creepCarryStorage === 'full' || creepCarryStorage === 'not full') && extension !== 0:
+                    currentTask = "Move e e2xt";
+                    fTransferEnergy(extension);
+                    break;
 
-            case (creepCarryStorage === 'full' || creepCarryStorage === 'not full') && extension !== 0:
-                currentTask = "Move e e2xt";
-                fTransferEnergy(extension);
-                break;
+                case (creepCarryStorage === 'full' || creepCarryStorage === 'not full') && tower !== 0:
+                    currentTask = "Move e tower";
+                    fTransferEnergy(tower);
+                    break;
 
-            case (creepCarryStorage === 'full' || creepCarryStorage === 'not full') && tower !== 0:
-                currentTask = "Move e tower";
-                fTransferEnergy(tower);
-                break;
+                default:
+                    creep.say("🚬");
+                    break;
 
-         // case creepCarryStorage === 'not full' && tower !== 0 && extension !== 0 && spawn !== 0:
-         //     fWithdrawEnergy(storage);
-         //     break; // withdrawing energy from storage while have no job
-
-        /*  case droppedResource !== null && creepCarryStorage === "full":
-              currentTask = "Move e storage";
-              fTransferEnergy(storage);
-              break;
-
-          case droppedResource !== null && (creepCarryStorage === "empty" || creepCarryStorage === "not full"):
-              currentTask = "pick up shit";
-              fPickupResource(droppedResource);
-              break;
-*/ // PickUp Module for freighter
-            default:
-                creep.say("🚬");
-                break;
+            }
 
         }
 
+        if (creepHome === 'W2N6') {
+
+            switch (true) {
+                case creepCarryStorage === "empty" && (tower !== 0 || extension !== 0 || spawn !== 0):
+
+                    fWithdrawEnergy(container);
+                    break;
+
+                case (creepCarryStorage === 'full' || creepCarryStorage === 'not full') && spawn !== 0:
+
+                    fTransferEnergy(spawn);
+                    break;
+
+                case (creepCarryStorage === 'full' || creepCarryStorage === 'not full') && extension1 !== 0:
+
+                    fTransferEnergy(extension1);
+                    break;
+
+                case (creepCarryStorage === 'full' || creepCarryStorage === 'not full') && tower !== 0:
+
+                    fTransferEnergy(tower);
+                    break;
+
+                default:
+                    creep.say("🚬");
+                    break;
+
+            }
+
+        }
+        break;
+
+    default:
+        fMoveToExit(creepHome)
+        break;
+}
 
 
 
+
+
+        function fMoveToExit(fTarget) {
+
+            let exit = creep.room.findExitTo(fTarget);
+            let exitPos = creep.pos.findClosestByRange(exit);
+
+            creep.moveTo(exitPos);
+
+
+
+        }
 
         function fParsingModule(structureType, energyType, math, neededValue ) { // math can be "more" "less" "equal"
             var foundedStructures = creep.room.find(FIND_STRUCTURES, {
