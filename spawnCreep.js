@@ -5,7 +5,7 @@ module.exports = function() {
 
 // ---------------------------------------------------------------------------------------------------------------------
 // Global parts [WORK, CARRY, MOVE]
-    const partsForMiner = [6, 4, 2];
+    const partsForMiner = [6, 4, 3];
     const partsForUpgrader = [6, 4, 2];
     const partsForRepairer = [3, 4, 3];
     const partsForBuilder = [3, 6, 5];
@@ -99,7 +99,7 @@ module.exports = function() {
             if (creepRoom === 'W2N6'){
                 switch (roleName) {
                     case 'miner':
-                        bodyParts = fCreateBody(3, 5, 5)
+                        bodyParts = fCreateBody(partsForMiner[0], partsForMiner[1], partsForMiner[2])
                         return this.createCreep(bodyParts, "Miner - " + Memory.statistics.miners + " - " + creepRoom, {
                             role: roleName,
                             home: creepRoom,
@@ -108,7 +108,7 @@ module.exports = function() {
                         });
 
                     case 'upgrader':
-                        bodyParts = fCreateBody(partsForUpgrader[0], partsForUpgrader[1], partsForUpgrader[2])
+                        bodyParts = fCreateBody(3, 3, 3)
 
                         return this.createCreep(bodyParts, "Upgrader - " + Memory.statistics.upgraders + " - " + creepRoom, {
                             role: roleName,
@@ -124,7 +124,7 @@ module.exports = function() {
                         });
 
                     case 'repairer':
-                        bodyParts = fCreateBody(partsForRepairer[0], partsForRepairer[1], partsForRepairer[2])
+                        bodyParts = fCreateBody(3, 3, 3)
 
                         return this.createCreep(bodyParts, "Repairer - " + Memory.statistics.repairers + " - " + creepRoom, {
                             role: roleName,
@@ -140,7 +140,7 @@ module.exports = function() {
                         });
 
                     case 'bridge':
-                        bodyParts = fCreateBody(partsForBridge[0], partsForBridge[1], partsForBridge[2])
+                        bodyParts = fCreateBody(partsForFreighter[0], partsForFreighter[1], partsForFreighter[2])
 
                         return this.createCreep(bodyParts, "Bridges - " + Memory.statistics.bridges + " - " + creepRoom, {
                             role: roleName,
