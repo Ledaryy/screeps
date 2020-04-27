@@ -165,7 +165,7 @@ module.exports = {
         function fMoveToExit(fTarget) {
 
             let exit = creep.room.findExitTo(fTarget);
-            let exitPos = creep.pos.findClosestByRange(exit);
+            let exitPos = creep.pos.findClosestByPath(exit);
 
             creep.moveTo(exitPos);
 
