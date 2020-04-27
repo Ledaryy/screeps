@@ -12,25 +12,55 @@ module.exports = {
             creepCarryStorage = 'undefined'
         }
 
+        var creepHome = creep.memory.home
+        var mainContainer = fParsingForContainer('W2N6', 24, 27)
         var link = fParsingForLink("W1N6", 17, 9, 0);
 
+ if (creepHome === 'W1N6') {
 
-        switch (creepCarryStorage) {
-            case 'full':
-                fUpgradeController();
-                break;
-            case 'empty':
+     switch (creepCarryStorage) {
+         case 'full':
+             fUpgradeController();
+             break;
+         case 'empty':
 
-                fWithdrawEnergy(link);
-                break;
-            case 'undefined':
-                fUpgradeController();
-                break;
-            default:
+             fWithdrawEnergy(link);
+             break;
+         case 'undefined':
+             fUpgradeController();
+             break;
+         default:
+
+
+     }
+ }
+
+        if (creepHome === 'W2N6') {
+
+            switch (creepCarryStorage) {
+                case 'full':
+                    fUpgradeController();
+                    break;
+                case 'empty':
+
+                   fWithdrawEnergy(mainContainer);
+                    break;
+                case 'undefined':
+                    fUpgradeController();
+                    break;
+                default:
+
+
+            }
+        }
+
+
+        function fParsingForContainer(roomName, xPosition, yPosition) {
+            let cont = Game.rooms[roomName].lookForAt('structure', xPosition, yPosition)[0];
+            return cont
 
 
         }
-
 
         function fUpgradeController() {
 
@@ -67,6 +97,17 @@ module.exports = {
                 return link
             } else {
                 return 0
+            }
+
+        }
+        
+        function fDismantle() {
+            let target = creep.pos.findClosestByRange(FIND_STRUCTURES,
+                {filter: {structureType: STRUCTURE_WALL}});
+            if(target) {
+                if(creep.dismantle(target) === ERR_NOT_IN_RANGE) {
+                    creep.moveTo(target);
+                }
             }
 
         }
