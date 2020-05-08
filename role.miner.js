@@ -1,12 +1,11 @@
-var roleBuilder = require('role.builder');
 
 module.exports = {
 
     run: function (creep) {
 
-        var creepHome = creep.memory.home
-        var creepPosition = creep.room.name;
-        var container = fParsingModule(STRUCTURE_CONTAINER, RESOURCE_ENERGY, "more", -1);
+        const creepHome = creep.memory.home
+        const creepPosition = creep.room.name;
+        const container = fParsingModule(STRUCTURE_CONTAINER, RESOURCE_ENERGY, "more", -1);
 
 
         switch (true) {
@@ -37,12 +36,22 @@ module.exports = {
                         break;
 
                     case creepPosition === 'W2N6' && creep.memory.carryStorage === 'full':
-                        fTransferEnergy(container);
+                        fMoveEnergyToLink()
                         break;
 
                     case creepPosition === 'W2N6' && creep.memory.carryStorage === 'empty':
                         harvestResources()
                         break
+
+                    case creepPosition === 'W1N7' && creep.memory.carryStorage === 'full':
+                        fTransferEnergy(container)
+                        break;
+
+                    case creepPosition === 'W1N7' && creep.memory.carryStorage === 'empty':
+                        harvestResources()
+                        break
+
+
 
                     default:
                         break;
@@ -55,7 +64,7 @@ module.exports = {
 
             default:
                 break;
-        }
+        } // Main Logic
 
         function fParsingModule(structureType, energyType, math, neededValue ) { // math can be "more" "less" "equal"
             var foundedStructures = creep.room.find(FIND_STRUCTURES, {
@@ -187,6 +196,14 @@ module.exports = {
 
                 case room === 'W2N6' && position === 'second':
                     creep.moveTo(5,13);
+                    break;
+
+                case room === 'W1N7' && position === 'first':
+                    creep.moveTo(25,10);
+                    break;
+
+                case room === 'W1N7' && position === 'second':
+                    creep.moveTo(34,34);
                     break;
 
 
