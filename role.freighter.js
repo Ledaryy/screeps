@@ -20,7 +20,7 @@ module.exports = {
         var spawn = fParsingModule(STRUCTURE_SPAWN, RESOURCE_ENERGY, "less", 300);
         var extension = fParsingModule(STRUCTURE_EXTENSION, RESOURCE_ENERGY, "less", 100);
         var extension1 = fParsingModule(STRUCTURE_EXTENSION, RESOURCE_ENERGY, "less", 50);
-        var tower = fParsingModule(STRUCTURE_TOWER, RESOURCE_ENERGY, "less", 1000);
+        var tower = fParsingModule(STRUCTURE_TOWER, RESOURCE_ENERGY, "less", 600);
         var storage = fParsingModule(STRUCTURE_STORAGE, RESOURCE_ENERGY, "less", 1000000);
         var container = fParsingModule(STRUCTURE_CONTAINER, RESOURCE_ENERGY, "more", 10);
         var droppedResource = creep.pos.findClosestByRange(FIND_DROPPED_RESOURCES);
@@ -36,6 +36,11 @@ switch (true) {
                     fWithdrawEnergy(storage);
                     break;
 
+                case (creepCarryStorage === 'full' || creepCarryStorage === 'not full') && tower !== 0:
+
+                    fTransferEnergy(tower);
+                    break;
+
                 case (creepCarryStorage === 'full' || creepCarryStorage === 'not full') && spawn !== 0:
                     currentTask = "Move e spawn";
                     fTransferEnergy(spawn);
@@ -46,12 +51,10 @@ switch (true) {
                     fTransferEnergy(extension);
                     break;
 
-                case (creepCarryStorage === 'full' || creepCarryStorage === 'not full') && tower !== 0:
-                    currentTask = "Move e tower";
-                    fTransferEnergy(tower);
-                    break;
 
                 default:
+                    creep.moveTo(21,16);
+                    fTransferEnergy(storage);
                     creep.say("🚬");
                     break;
 
@@ -64,7 +67,12 @@ switch (true) {
             switch (true) {
                 case creepCarryStorage === "empty" && (tower !== 0 || extension !== 0 || spawn !== 0):
 
-                    fWithdrawEnergy(container);
+                    fWithdrawEnergy(storage);
+                    break;
+
+                case (creepCarryStorage === 'full' || creepCarryStorage === 'not full') && tower !== 0:
+
+                    fTransferEnergy(tower);
                     break;
 
                 case (creepCarryStorage === 'full' || creepCarryStorage === 'not full') && spawn !== 0:
@@ -77,12 +85,45 @@ switch (true) {
                     fTransferEnergy(extension1);
                     break;
 
+
+
+                default:
+                    creep.moveTo(24,26);
+                    fTransferEnergy(storage);
+                    creep.say("🚬");
+                    break;
+
+            }
+
+        }
+
+        if (creepHome === 'W1N7') {
+
+            switch (true) {
+                case creepCarryStorage === "empty" && (tower !== 0 || extension !== 0 || spawn !== 0):
+
+                    fWithdrawEnergy(storage);
+                    break;
+
                 case (creepCarryStorage === 'full' || creepCarryStorage === 'not full') && tower !== 0:
 
                     fTransferEnergy(tower);
                     break;
 
+                case (creepCarryStorage === 'full' || creepCarryStorage === 'not full') && spawn !== 0:
+
+                    fTransferEnergy(spawn);
+                    break;
+
+                case (creepCarryStorage === 'full' || creepCarryStorage === 'not full') && extension1 !== 0:
+
+                    fTransferEnergy(extension1);
+                    break;
+
+
                 default:
+                    creep.moveTo(25,20);
+                    fTransferEnergy(storage);
                     creep.say("🚬");
                     break;
 
