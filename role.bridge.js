@@ -17,9 +17,19 @@ module.exports = {
 
         var container = fParsingModule(STRUCTURE_CONTAINER, RESOURCE_ENERGY, "more", 800);
         var storage = fParsingModule(STRUCTURE_STORAGE, RESOURCE_ENERGY, "less", 1000000);
-        var link = fParsingForLink("W1N6", 21, 17, 0);
+        var link = fParsingForLink("W1N6", 21, 17, 1);
+        const linkW2N6 = fParsingForLink("W2N6", 25, 29, 1);
         var droppedResource = creep.pos.findClosestByRange(FIND_DROPPED_RESOURCES);
         var mainContainer = fParsingForContainer('W2N6', 24, 27)
+
+        var ruins = creep.room.find(FIND_RUINS, {
+            filter: function(r)
+            {
+                if (r.store[RESOURCE_ENERGY] > 0) { return r.store[RESOURCE_ENERGY] > 0}
+                return null
+            }
+
+        });
 
 
 switch (true) {
@@ -37,7 +47,7 @@ switch (true) {
                     fTransferEnergy(storage);
                     break;
                 default:
-                    creep.moveTo(21, 16);
+                    creep.moveTo(20, 16);
                     break;
 
             }
@@ -47,15 +57,51 @@ switch (true) {
 
             switch (true) {
                 case creepCarryStorage === "full":
-                    fTransferEnergy(mainContainer);
+                    fTransferEnergy(storage);
                     break;
-                case (creepCarryStorage === "empty" || creepCarryStorage === "not full"):
+                case (creepCarryStorage === "empty" || creepCarryStorage === "not full") && linkW2N6 !== 0:
+                    fWithdrawEnergy(linkW2N6)
+                    break;
+                case creepCarryStorage === "not full" && link === 0:
+                    fTransferEnergy(storage);
+                    break;
+                default:
+                    creep.moveTo(25, 28);
+                    break;
+
+            }
+        }
+
+        if (creepHome === 'W1N7') {
+
+            switch (true) {
+                case creepCarryStorage === "full":
+                    fTransferEnergy(storage);
+                    break;
+                case (creepCarryStorage === "empty" || creepCarryStorage === "not full") && container !== 0:
                     fWithdrawEnergy(container)
                     break;
-
-
+                case creepCarryStorage === "not full":
+                    fTransferEnergy(storage);
+                    break;
                 default:
-                    creep.moveTo(24, 28);
+                    switch (true) {
+                        case creepCarryStorage === "full":
+                            fTransferEnergy(storage);
+                            break;
+                        case (creepCarryStorage === "empty" || creepCarryStorage === "not full") && ruins !== null:
+                            fPickupResource(droppedResource);
+                            fWithdrawEnergy(ruins[0])
+
+                            break;
+                        case creepCarryStorage === "not full":
+                            fTransferEnergy(storage);
+                            break;
+                        default:
+
+                            creep.moveTo(22, 20);
+                            break;
+                    }
                     break;
 
             }
@@ -103,19 +149,26 @@ switch (true) {
             var foundedStructures = creep.room.find(FIND_STRUCTURES, {
                 filter: (s) => s.structureType == structureType
             });
+            var foundedCorrectStructures = [];
+            var bestPath = [];
+
             switch (math) {
                 case "more":
                     if (foundedStructures.length > 0) {
                         for (let structure of foundedStructures ){
                             var energyOfStructure = structure.store[energyType];
                             if (energyOfStructure > neededValue) {
-                                return structure
+                                foundedCorrectStructures.push(structure)
+
                             } // We looking fo structure which have > than neededValue
                         } // import wants a array of structures
+                        bestPath = creep.pos.findClosestByPath(foundedCorrectStructures);
+                        if (bestPath !== null){
+                            return bestPath;
+                        }
+
                     }
-                    else {
-                        return "no structures found"
-                    }
+
                     return 0;
                     break;
                 case "less":
@@ -123,13 +176,15 @@ switch (true) {
                         for (let structure of foundedStructures ){
                             var energyOfStructure = structure.store[energyType];
                             if (energyOfStructure < neededValue) {
-                                return structure
+                                foundedCorrectStructures.push(structure)
                             } // We looking fo structure which have > than neededValue
                         } // import wants a array of structures
+                        bestPath = creep.pos.findClosestByPath(foundedCorrectStructures);
+                        if (bestPath !== null){
+                            return bestPath;
+                        }
                     }
-                    else {
-                        return "no structures found"
-                    }
+
                     return 0;
                     break;
                 case "equal":
@@ -137,20 +192,23 @@ switch (true) {
                         for (let structure of foundedStructures ){
                             var energyOfStructure = structure.store[energyType];
                             if (energyOfStructure === neededValue) {
-                                return structure
+                                foundedCorrectStructures.push(structure)
+
                             } // We looking fo structure which have > than neededValue
                         } // import wants a array of structures
+                        bestPath = creep.pos.findClosestByPath(foundedCorrectStructures);
+                        if (bestPath !== null){
+                            return bestPath;
+                        }
                     }
-                    else {
-                        return "no structures found"
-                    }
+
                     return 0;
                     break;
                 default:
                     console.log("Wrong math type!!!");
                     break;
             }
-        }
+        } // v 1.1
 
 
         function fPickupResource(fResource) {
