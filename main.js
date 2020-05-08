@@ -8,7 +8,8 @@ var roleBridge = require('role.bridge');
 var roleWallRepairer = require('role.wallRepairer');
 var roleClaimer = require('role.claimer');
 var roleTrain = require('role.train');
-var rolePanzer = require('role.panzer')
+var rolePanzer = require('role.panzer');
+var roleScout = require('role.scout');
 
 module.exports.loop = function () {
     // TODO rework functions to work with true/false, not with 0
@@ -20,6 +21,7 @@ module.exports.loop = function () {
     } // clearing the memory
 
 // ---------------------------------------------------------------------------------------------------------------------
+    // TODO we need new creep - scout, to have vision in nearest rooms
     for (let name in Game.creeps) {
 
         var creep = Game.creeps[name];
@@ -32,10 +34,6 @@ module.exports.loop = function () {
 
             case 'upgrader' :
                 roleUpgrader.run(creep);
-                break;
-
-            case 'builder' :
-                roleBuilder.run(creep);
                 break;
 
             case 'repairer' :
@@ -66,6 +64,14 @@ module.exports.loop = function () {
                 rolePanzer.run(creep);
                 break;
 
+            case 'builder' :
+                roleBuilder.run(creep);
+                break;
+
+            case 'scout':
+                roleScout.run(creep);
+                break;
+
             case 'undefined' :
                 console.log("Returned undefined");
                 break;
@@ -79,50 +85,74 @@ module.exports.loop = function () {
 // ---------------------------------------------------------------------------------------------------------------------
 // Towers Module :
 
-    const towers = Game.rooms.W1N6.find(FIND_STRUCTURES, {
-        filter: (s) => s.structureType === STRUCTURE_TOWER
-    });
-    var everything = creep.pos.findClosestByPath(FIND_STRUCTURES, {
-        filter: (f) => f.structureType !== STRUCTURE_WALL && f.structureType !== STRUCTURE_RAMPART && f.hits < f.hitsMax
-    })
-    for (let tower of towers) {
-        var target = tower.pos.findClosestByRange(FIND_HOSTILE_CREEPS);
-        if (target !== undefined) {
-            tower.attack(target);
-        }
-        if (everything !== undefined){
-            tower.repair(everything);
-        }
+
+    const TowersW1N6 = fFindTowers('W1N6')
+    const TowersW1N7 = fFindTowers('W1N7')
+    const TowersW2N6 = fFindTowers('W2N6')
+
+
+
+    for (let tower of TowersW1N6) {
+        let fireTarget = tower.pos.findClosestByRange(FIND_HOSTILE_CREEPS);
+        let repairTarget = tower.pos.findClosestByRange(FIND_STRUCTURES, {
+            filter: (f) => f.structureType !== STRUCTURE_WALL && f.structureType !== STRUCTURE_RAMPART && f.hits < f.hitsMax
+        })
+        let healTarget = tower.pos.findClosestByRange(FIND_MY_CREEPS, {
+            filter: (f) =>  f.hits < f.hitsMax
+        })
+
+
+
+        if (fireTarget !== undefined) { tower.attack(fireTarget) }
+        if ( repairTarget !== undefined ) { tower.repair(repairTarget)}
+        if ( healTarget !== undefined) { tower.heal(healTarget)}
+
+    }
+    for (let tower of TowersW1N7) {
+        let fireTarget = tower.pos.findClosestByRange(FIND_HOSTILE_CREEPS);
+        let repairTarget = tower.pos.findClosestByRange(FIND_STRUCTURES, {
+            filter: (f) => f.structureType !== STRUCTURE_WALL && f.structureType !== STRUCTURE_RAMPART && f.hits < f.hitsMax
+        })
+        let healTarget = tower.pos.findClosestByRange(FIND_MY_CREEPS, {
+            filter: (f) =>  f.hits < f.hitsMax
+        })
+
+
+
+        if (fireTarget !== undefined) { tower.attack(fireTarget) }
+        if ( repairTarget !== undefined ) { tower.repair(repairTarget)}
+        if ( healTarget !== undefined) { tower.heal(healTarget)}
+
+    }
+    for (let tower of TowersW2N6) {
+        let fireTarget = tower.pos.findClosestByRange(FIND_HOSTILE_CREEPS);
+        let repairTarget = tower.pos.findClosestByRange(FIND_STRUCTURES, {
+            filter: (f) => f.structureType !== STRUCTURE_WALL && f.structureType !== STRUCTURE_RAMPART && f.hits < f.hitsMax
+        })
+        let healTarget = tower.pos.findClosestByRange(FIND_MY_CREEPS, {
+            filter: (f) =>  f.hits < f.hitsMax
+        })
+
+
+
+        if (fireTarget !== undefined) { tower.attack(fireTarget) }
+        if ( repairTarget !== undefined ) { tower.repair(repairTarget)}
+        if ( healTarget !== undefined) { tower.heal(healTarget)}
+
     }
 
-    const towers1 = Game.rooms.W2N6.find(FIND_STRUCTURES, {
-        filter: (s) => s.structureType === STRUCTURE_TOWER
-    });
-    for (let tower of towers1) {
-        var target1 = tower.pos.findClosestByRange(FIND_HOSTILE_CREEPS);
-        if (target1 !== undefined) {
-            tower.attack(target1);
-        }
-        if (everything !== undefined){
-            tower.repair(everything);
-        }
-    }
 
-
-    var towerinka = fFindTowers('Spawn1');
-    console.log(towerinka,'tow')
     function fFindTowers(fRoom) {
-        let towers = Game.spawns[fRoom].room.find(FIND_STRUCTURES, {
+        return Game.rooms[fRoom].find(FIND_STRUCTURES, {
             filter: (f) => f.structureType === STRUCTURE_TOWER
-        });
-
+        })
 
     }
 
 // ---------------------------------------------------------------------------------------------------------------------
 // Minimum needed creeps for colony
     const miners = 2;
-    const upgraders = 1;
+    const upgraders = 2;
     const builders = 0;
     const repairers = 0;
     const freighters = 1;
@@ -131,6 +161,7 @@ module.exports.loop = function () {
     const claimers = 0;
     const trains = 0;
     const panzers = 0;
+    const scouts = 0;
 
 // current amount owned by colony in W1N6
     const W1N6_Miners = fGetAmountOfCreeps('miner', 'W1N6')
@@ -143,6 +174,7 @@ module.exports.loop = function () {
     const W1N6_Claimers = fGetAmountOfCreeps('claimer', 'W1N6')
     const W1N6_Trains = fGetAmountOfCreeps('train', 'W1N6')
     const W1N6_Panzers = fGetAmountOfCreeps('panzer', 'W1N6')
+    const W1N6_Scouts = fGetAmountOfCreeps('scout', 'W1N6')
 
 // current amount owned by colony in W2N6
     const W2N6_Miners = fGetAmountOfCreeps('miner', 'W2N6')
@@ -153,6 +185,7 @@ module.exports.loop = function () {
     const W2N6_Bridges = fGetAmountOfCreeps('bridge', 'W2N6')
     const W2N6_WallRepairers = fGetAmountOfCreeps('wallRepairer', 'W2N6')
     const W2N6_Claimers = fGetAmountOfCreeps('claimer', 'W2N6')
+    const W2N6_Scouts = fGetAmountOfCreeps('scout', 'W2N6')
 
     // current amount owned by colony in W1N7
     const W1N7_Miners = fGetAmountOfCreeps('miner', 'W1N7')
@@ -165,7 +198,7 @@ module.exports.loop = function () {
     const W1N7_Claimers = fGetAmountOfCreeps('claimer', 'W1N7')
     const W1N7_Trains = fGetAmountOfCreeps('train', 'W1N7')
     const W1N7_Panzers = fGetAmountOfCreeps('panzer', 'W1N7')
-
+    const W1N7_Scouts = fGetAmountOfCreeps('scout', 'W1N7')
 
 // Spawner core module
 
@@ -261,12 +294,12 @@ module.exports.loop = function () {
             break;
 
 
-        case W2N6_Upgraders < 5:
+        case W2N6_Upgraders < 4:
             Game.spawns.Spawn2.spawnMyCreep('upgrader', 'W2N6')
             Memory.statistics.upgraders += 1;
             break;
 
-        case W2N6_Builders < builders:
+        case W2N6_Builders < 2:
             Game.spawns.Spawn2.spawnMyCreep('builder', 'W2N6')
             Memory.statistics.builders += 1;
             break;
@@ -277,7 +310,7 @@ module.exports.loop = function () {
             break;
 
 
-        case W2N6_WallRepairers < 2:
+        case W2N6_WallRepairers < 1:
             Game.spawns.Spawn2.spawnMyCreep('wallRepairer', 'W2N6')
             Memory.statistics.wallRepairers += 1;
             break;
@@ -285,6 +318,12 @@ module.exports.loop = function () {
         case W2N6_Claimers < 1:
             Game.spawns.Spawn2.spawnMyCreep('claimer', 'W2N6')
             Memory.statistics.claimers += 1;
+            break;
+
+        case W2N6_Scouts < 1:
+            Memory.scout.W2N7 = false
+            Game.spawns.Spawn2.spawnMyCreep('scout', 'W2N6', 'W2N7')
+            Memory.statistics.scouts += 1;
             break;
 
         default:
@@ -318,7 +357,7 @@ module.exports.loop = function () {
             Memory.statistics.upgraders += 1;
             break;
 
-        case W1N7_Builders < 1:
+        case W1N7_Builders < builders:
             Game.spawns.Spawn3.spawnMyCreep('builder', 'W1N7')
             Memory.statistics.builders += 1;
             break;
