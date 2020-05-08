@@ -4,7 +4,7 @@
 module.exports = function() {
 
 // ---------------------------------------------------------------------------------------------------------------------
-// Global parts [WORK, CARRY, MOVE]
+// Global parts [WORK, CARRY, MOVE, CLAIM, TOUGH]
     const partsForMiner = [6, 4, 3];
     const partsForUpgrader = [6, 4, 2];
     const partsForRepairer = [3, 4, 3];
@@ -13,13 +13,26 @@ module.exports = function() {
     const partsForBridge = [0, 8, 1];
     const partsForWallRepairer = [3, 4, 3];
     const partsForClaimer = [1, 1, 6];
+    const partForTank = [0, 0, 10, 0, 40]
+
+    const partsManager = {
+        partsForMiner: [6, 4, 3],
+        partsForUpgrader: [6, 4, 2],
+        partsForRepairer: [3, 4, 3],
+        partsForBuilder: [3, 6, 5],
+        partsForFreighter: [0, 16, 8],
+        partsForBridge: [0, 8, 1],
+        partsForWallRepairer: [3, 4, 3],
+        partsForClaimer: [1, 1, 6],
+    }
+
 
 // ---------------------------------------------------------------------------------------------------------------------
 // Mining Module!
     let bodyParts = [];
 
     StructureSpawn.prototype.spawnMyCreep=
-        function (roleName, creepRoom) {
+        function (roleName, creepRoom, target) {
 
 
             if (creepRoom === 'W1N6'){
@@ -47,6 +60,7 @@ module.exports = function() {
                         return this.createCreep(bodyParts, "Builder - " + Memory.statistics.builders + " - " + creepRoom, {
                             role: roleName,
                             home: creepRoom,
+                            carryStorage: 'empty',
                         });
 
                     case 'repairer':
@@ -89,6 +103,26 @@ module.exports = function() {
                             home: creepRoom,
                         });
 
+                    case 'train':
+                        bodyParts = fCreateBody(partsForFreighter[0], partsForFreighter[1], partsForFreighter[2])
+                        return this.createCreep(bodyParts, "Train - " + Memory.statistics.trains + " - " + creepRoom, {
+                            role: roleName,
+                            home: creepRoom,
+                            cargo: 'empty',
+                            target: target,
+
+                        });
+
+                    case 'panzer':
+                        bodyParts = fCreateBody(0, 0, 10, 0, 0, 25)
+
+                        return this.createCreep(bodyParts, "Panzer - " + Memory.statistics.panzers + " - " + creepRoom, {
+                            role: roleName,
+                            home: creepRoom,
+                            targetRoom: "W1N7",
+                        });
+
+
                     default:
                         console.log('Error in main spawn module');
                         break;
@@ -104,6 +138,83 @@ module.exports = function() {
                             role: roleName,
                             home: creepRoom,
                             position: fGetMiningPosition('W2N6'),
+                            carryStorage: 'empty',
+                        });
+
+                    case 'upgrader':
+                        bodyParts = fCreateBody(3, 3, 3)
+
+                        return this.createCreep(bodyParts, "Upgrader - " + Memory.statistics.upgraders + " - " + creepRoom, {
+                            role: roleName,
+                            home: creepRoom,
+                        });
+
+                    case 'builder':
+                        bodyParts = fCreateBody(partsForBuilder[0], partsForBuilder[1], partsForBuilder[2])
+
+                        return this.createCreep(bodyParts, "Builder - " + Memory.statistics.builders + " - " + creepRoom, {
+                            role: roleName,
+                            home: creepRoom,
+                            carryStorage: 'empty',
+                        });
+
+                    case 'repairer':
+                        bodyParts = fCreateBody(3, 3, 3)
+
+                        return this.createCreep(bodyParts, "Repairer - " + Memory.statistics.repairers + " - " + creepRoom, {
+                            role: roleName,
+                            home: creepRoom,
+                        });
+
+                    case 'freighter':
+                        bodyParts = fCreateBody(partsForFreighter[0], partsForFreighter[1], partsForFreighter[2])
+
+                        return this.createCreep(bodyParts, "Freighter - " + Memory.statistics.freighter + " - " + creepRoom, {
+                            role: roleName,
+                            home: creepRoom,
+                        });
+
+                    case 'bridge':
+                        bodyParts = fCreateBody(partsForBridge[0], partsForBridge[1], partsForBridge[2])
+
+                        return this.createCreep(bodyParts, "Bridges - " + Memory.statistics.bridges + " - " + creepRoom, {
+                            role: roleName,
+                            home: creepRoom,
+                        });
+
+                    case 'wallRepairer':
+                        bodyParts = fCreateBody(partsForWallRepairer[0], partsForWallRepairer[1], partsForWallRepairer[2])
+
+                        return this.createCreep(bodyParts, "WallRepairer - " + Memory.statistics.wallRepairers + " - " + creepRoom, {
+                            role: roleName,
+                            home: creepRoom,
+                        });
+
+                    case 'claimer':
+                        bodyParts = fCreateBody(0, 0, 5, 2, 0, 0)
+
+                        return this.createCreep(bodyParts, "Claimer - " + Memory.statistics.claimers + " - " + creepRoom, {
+                            role: roleName,
+                            home: creepRoom,
+                            roomTarget: 'W2N7'
+                        });
+
+
+                    default:
+                        console.log('Error in main spawn module');
+                        break;
+
+                }
+            }
+
+            if (creepRoom === 'W1N7'){
+                switch (roleName) {
+                    case 'miner':
+                        bodyParts = fCreateBody(partsForMiner[0], partsForMiner[1], partsForMiner[2])
+                        return this.createCreep(bodyParts, "Miner - " + Memory.statistics.miners + " - " + creepRoom, {
+                            role: roleName,
+                            home: creepRoom,
+                            position: fGetMiningPosition('W1N7'),
                             carryStorage: 'empty',
                         });
 
@@ -156,12 +267,14 @@ module.exports = function() {
                         });
 
                     case 'claimer':
-                        bodyParts = fCreateBody(partsForClaimer[0], partsForClaimer[1], partsForClaimer[2])
+                        bodyParts = fCreateBody(0, 0, 5, 2, 0, 0)
 
                         return this.createCreep(bodyParts, "Claimer - " + Memory.statistics.claimers + " - " + creepRoom, {
                             role: roleName,
                             home: creepRoom,
+                            roomTarget: 'W2N7'
                         });
+
 
                     default:
                         console.log('Error in main spawn module');
@@ -169,8 +282,6 @@ module.exports = function() {
 
                 }
             }
-
-
 
 
         };
@@ -188,7 +299,7 @@ module.exports = function() {
 
     }
 
-    function fCreateBody(fWork, fCarry, fMove, fClaim) {
+    function fCreateBody(fWork, fCarry, fMove, fClaim, fTough, fAttack) {
 
         let fBodyParts = [];
 
@@ -204,6 +315,12 @@ module.exports = function() {
         for (let i = 0; i < fMove; i++) {
             fBodyParts.push(MOVE);
         }
+        for (let i = 0; i < fTough; i++) {
+            fBodyParts.push(TOUGH);
+        }
+        for (let i = 0; i < fAttack; i++) {
+            fBodyParts.push(ATTACK);
+        }
 
 
         return fBodyParts;
@@ -214,47 +331,32 @@ module.exports = function() {
     function fGetMiningPosition(roomName) {
 
 
-        let W1N6_First = fGetAmountOfCreeps('miner', 'W1N6', 'first');
-        let W1N6_Second = fGetAmountOfCreeps('miner', 'W1N6', 'second');
+        let W1N6_FirstPos = fGetAmountOfCreeps('miner', 'W1N6', 'first');
+        let W1N6_SecondPos = fGetAmountOfCreeps('miner', 'W1N6', 'second');
 
-        let W2N6_First = fGetAmountOfCreeps('miner', 'W2N6', 'first');
-        let W2N6_Second = fGetAmountOfCreeps('miner', 'W2N6', 'second');
+        let W2N6_FirstPos = fGetAmountOfCreeps('miner', 'W2N6', 'first');
+        let W2N6_SecondPos = fGetAmountOfCreeps('miner', 'W2N6', 'second');
 
-        if (roomName === 'W1N6') {
+        let W1N7_FirstPos = fGetAmountOfCreeps('miner', 'W1N7', 'first');
+        let W1N7_SecondPos = fGetAmountOfCreeps('miner', 'W1N7', 'second');
 
-            switch (true) {
-                case W1N6_First === 1 && W1N6_Second === 0:
-                    return 'second'
-
-                case W1N6_First === 0 && W1N6_Second === 1:
-                    return 'first'
-
-                case W1N6_First === 0 && W1N6_Second === 0:
-                    return 'first';
-
-                default:
-                    break;
-
-            } // Choosing creep for W1N6
+        switch (true) {
+            case roomName === 'W1N6' && W1N6_FirstPos === 1:
+                return 'second'
+            case roomName === 'W1N6' && W1N6_SecondPos === 1:
+                return 'first'
+            case roomName === 'W2N6' && W2N6_FirstPos === 1:
+                return 'second'
+            case roomName === 'W2N6' && W2N6_SecondPos === 1:
+                return 'first'
+            case roomName === 'W1N7' && W1N7_FirstPos === 1:
+                return 'second'
+            case roomName === 'W1N7' && W1N7_SecondPos === 1:
+                return 'first'
+            default:
+                return 'first'
         }
-        if (roomName === 'W2N6') {
 
-            switch (true) {
-                case W2N6_First === 1 && W2N6_Second === 0:
-                    return 'second'
-
-                case W2N6_First === 0 && W2N6_Second === 1:
-                    return 'first'
-
-                case W2N6_First === 0 && W2N6_Second === 0:
-                    return 'first';
-
-                default:
-                    break;
-
-
-            }
-        }
 
     }
 // ---------------------------------------------------------------------------------------------------------------------
