@@ -20,42 +20,33 @@ module.exports = {
                 break;
         }
 
-
-        const spawn = creep.findStructure(STRUCTURE_SPAWN, RESOURCE_ENERGY, "less", 300);
-        const extension = creep.findStructure(STRUCTURE_EXTENSION, RESOURCE_ENERGY, "less", 100);
-        const extensionLowPower = creep.findStructure(STRUCTURE_EXTENSION, RESOURCE_ENERGY, "less", 50);
-        const tower = creep.findStructure(STRUCTURE_TOWER, RESOURCE_ENERGY, "less", 600);
-        const storage = creep.findStructure(STRUCTURE_STORAGE, RESOURCE_ENERGY, "less", 1000000);
-        const droppedResource = creep.pos.findClosestByRange(FIND_DROPPED_RESOURCES);
-
-
-
+        const data = creep.dataPack()
 
 switch (true) {
     case creepPosition === creepHome:
         if (creepHome === 'W1N6') {
 
             switch (true) {
-                case creep.memory.carryStorage === "empty" && (tower !== 'full' || extension !== 'full' || spawn !== 'full'):
-                    creep.withdrawFrom(storage, RESOURCE_ENERGY)
+                case creep.memory.carryStorage === "empty" && (data.tower !== 'full' || data.extension !== 'full' || data.spawn !== 'full'):
+                    creep.withdrawFrom(data.storage, RESOURCE_ENERGY)
                     break;
 
-                case creep.memory.carryStorage === "full" && tower !== 'full':
-                    creep.transferTo(tower, RESOURCE_ENERGY)
+                case creep.memory.carryStorage === "full" && data.tower !== 'full':
+                    creep.transferTo(data.tower, RESOURCE_ENERGY)
                     break;
 
-                case creep.memory.carryStorage === "full" && spawn !== 'full':
-                    creep.transferTo(spawn, RESOURCE_ENERGY)
+                case creep.memory.carryStorage === "full" && data.spawn !== 'full':
+                    creep.transferTo(data.spawn, RESOURCE_ENERGY)
                     break;
 
-                case creep.memory.carryStorage === "full" && extension !== 'full':
-                    creep.transferTo(extension, RESOURCE_ENERGY)
+                case creep.memory.carryStorage === "full" && data.extension !== 'full':
+                    creep.transferTo(data.extension, RESOURCE_ENERGY)
                     break;
 
 
                 default:
                     creep.moveTo(21,16);
-                    creep.transferTo(storage, RESOURCE_ENERGY)
+                    creep.transferTo(data.storage, RESOURCE_ENERGY)
                     creep.say("🚬");
                     break;
 
@@ -66,26 +57,26 @@ switch (true) {
         if (creepHome === 'W2N6') {
 
             switch (true) {
-                case creep.memory.carryStorage === "empty" && (tower !== 'full' || extensionLowPower !== 'full' || spawn !== 'full'):
-                    creep.withdrawFrom(storage, RESOURCE_ENERGY)
+                case creep.memory.carryStorage === "empty" && (data.tower !== 'full' || data.extensionLowPower !== 'full' || data.spawn !== 'full'):
+                    creep.withdrawFrom(data.storage, RESOURCE_ENERGY)
                     break;
 
-                case creep.memory.carryStorage === "full" && tower !== 'full':
-                    creep.transferTo(tower, RESOURCE_ENERGY)
+                case creep.memory.carryStorage === "full" && data.tower !== 'full':
+                    creep.transferTo(data.tower, RESOURCE_ENERGY)
                     break;
 
-                case creep.memory.carryStorage === "full" && spawn !== 'full':
-                    creep.transferTo(spawn, RESOURCE_ENERGY)
+                case creep.memory.carryStorage === "full" && data.spawn !== 'full':
+                    creep.transferTo(data.spawn, RESOURCE_ENERGY)
                     break;
 
-                case creep.memory.carryStorage === "full" && extensionLowPower !== 'full':
-                    creep.transferTo(extensionLowPower, RESOURCE_ENERGY)
+                case creep.memory.carryStorage === "full" && data.extensionLowPower !== 'full':
+                    creep.transferTo(data.extensionLowPower, RESOURCE_ENERGY)
                     break;
 
 
                 default:
                     creep.moveTo(24,26);
-                    creep.transferTo(storage, RESOURCE_ENERGY)
+                    creep.transferTo(data.storage, RESOURCE_ENERGY)
                     creep.say("🚬");
                     break;
 
@@ -96,26 +87,26 @@ switch (true) {
         if (creepHome === 'W1N7') {
 
             switch (true) {
-                case creep.memory.carryStorage === "empty" && (tower !== 'full' || extensionLowPower !== 'full' || spawn !== 'full'):
-                    creep.withdrawFrom(storage, RESOURCE_ENERGY)
+                case creep.memory.carryStorage === "empty" && (data.tower !== 'full' || data.extensionLowPower !== 'full' || data.spawn !== 'full'):
+                    creep.withdrawFrom(data.storage, RESOURCE_ENERGY)
                     break;
 
-                case creep.memory.carryStorage === "full" && tower !== 'full':
-                    creep.transferTo(tower, RESOURCE_ENERGY)
+                case creep.memory.carryStorage === "full" && data.tower !== 'full':
+                    creep.transferTo(data.tower, RESOURCE_ENERGY)
                     break;
 
-                case creep.memory.carryStorage === "full" && spawn !== 'full':
-                    creep.transferTo(spawn, RESOURCE_ENERGY)
+                case creep.memory.carryStorage === "full" && data.spawn !== 'full':
+                    creep.transferTo(data.spawn, RESOURCE_ENERGY)
                     break;
 
-                case creep.memory.carryStorage === "full" && extensionLowPower !== 'full':
-                    creep.transferTo(extensionLowPower, RESOURCE_ENERGY)
+                case creep.memory.carryStorage === "full" && data.extensionLowPower !== 'full':
+                    creep.transferTo(data.extensionLowPower, RESOURCE_ENERGY)
                     break;
 
 
                 default:
                     creep.moveTo(25,20);
-                    creep.transferTo(storage, RESOURCE_ENERGY)
+                    creep.transferTo(data.storage, RESOURCE_ENERGY)
                     creep.say("🚬");
                     break;
 
@@ -128,6 +119,9 @@ switch (true) {
         creep.moveToExit(creepHome)
         break;
 }
+
+
+
 
 
     }
