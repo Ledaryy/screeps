@@ -1,0 +1,19 @@
+{
+  "name": "default",
+  "version": "1.0.0",
+  "description": "",
+  "main": "main.js",
+  "scripts": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Ledaryy/screeps.git"
+  },
+  "author": "Ledary",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Ledaryy/screeps/issues"
+  },
+  "homepage": "https://github.com/Ledaryy/screeps#readme"
+}
