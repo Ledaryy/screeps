@@ -1,4 +1,10 @@
 require('spawnCreep')();
+require('myConstructionSite');
+require('prototype.creep');
+var army = require('global_functions');
+var towerLogic = require('logic.towers')
+var linkLogic = require('logic.links')
+
 var roleMiner = require('role.miner');
 var roleUpgrader = require('role.upgrader');
 var roleBuilder = require('role.builder');
@@ -12,6 +18,9 @@ var rolePanzer = require('role.panzer');
 var roleScout = require('role.scout');
 
 module.exports.loop = function () {
+
+ // console.log(army.apple, 'amount of army.apple')
+   // console.log(army)
     // TODO rework functions to work with true/false, not with 0
 // ---------------------------------------------------------------------------------------------------------------------
     for (let name in Memory.creeps) {
@@ -20,11 +29,16 @@ module.exports.loop = function () {
         }
     } // clearing the memory
 
+    Memory.scout.W2N7 = false
+
 // ---------------------------------------------------------------------------------------------------------------------
     // TODO we need new creep - scout, to have vision in nearest rooms
+    // TODO Truck to make long range harvesting possible
+    // TODO make config file with getters and setters
     for (let name in Game.creeps) {
 
-        var creep = Game.creeps[name];
+        let creep = Game.creeps[name];
+        
 
         switch (creep.memory.role) {
 
@@ -64,13 +78,14 @@ module.exports.loop = function () {
                 rolePanzer.run(creep);
                 break;
 
-            case 'builder' :
-                roleBuilder.run(creep);
-                break;
-
             case 'scout':
                 roleScout.run(creep);
                 break;
+
+            case 'builder' :
+              roleBuilder.run(creep);
+                break;
+                
 
             case 'undefined' :
                 console.log("Returned undefined");
@@ -85,75 +100,13 @@ module.exports.loop = function () {
 // ---------------------------------------------------------------------------------------------------------------------
 // Towers Module :
 
-
-    const TowersW1N6 = fFindTowers('W1N6')
-    const TowersW1N7 = fFindTowers('W1N7')
-    const TowersW2N6 = fFindTowers('W2N6')
-
-
-
-    for (let tower of TowersW1N6) {
-        let fireTarget = tower.pos.findClosestByRange(FIND_HOSTILE_CREEPS);
-        let repairTarget = tower.pos.findClosestByRange(FIND_STRUCTURES, {
-            filter: (f) => f.structureType !== STRUCTURE_WALL && f.structureType !== STRUCTURE_RAMPART && f.hits < f.hitsMax
-        })
-        let healTarget = tower.pos.findClosestByRange(FIND_MY_CREEPS, {
-            filter: (f) =>  f.hits < f.hitsMax
-        })
-
-
-
-        if (fireTarget !== undefined) { tower.attack(fireTarget) }
-        if ( repairTarget !== undefined ) { tower.repair(repairTarget)}
-        if ( healTarget !== undefined) { tower.heal(healTarget)}
-
-    }
-    for (let tower of TowersW1N7) {
-        let fireTarget = tower.pos.findClosestByRange(FIND_HOSTILE_CREEPS);
-        let repairTarget = tower.pos.findClosestByRange(FIND_STRUCTURES, {
-            filter: (f) => f.structureType !== STRUCTURE_WALL && f.structureType !== STRUCTURE_RAMPART && f.hits < f.hitsMax
-        })
-        let healTarget = tower.pos.findClosestByRange(FIND_MY_CREEPS, {
-            filter: (f) =>  f.hits < f.hitsMax
-        })
-
-
-
-        if (fireTarget !== undefined) { tower.attack(fireTarget) }
-        if ( repairTarget !== undefined ) { tower.repair(repairTarget)}
-        if ( healTarget !== undefined) { tower.heal(healTarget)}
-
-    }
-    for (let tower of TowersW2N6) {
-        let fireTarget = tower.pos.findClosestByRange(FIND_HOSTILE_CREEPS);
-        let repairTarget = tower.pos.findClosestByRange(FIND_STRUCTURES, {
-            filter: (f) => f.structureType !== STRUCTURE_WALL && f.structureType !== STRUCTURE_RAMPART && f.hits < f.hitsMax
-        })
-        let healTarget = tower.pos.findClosestByRange(FIND_MY_CREEPS, {
-            filter: (f) =>  f.hits < f.hitsMax
-        })
-
-
-
-        if (fireTarget !== undefined) { tower.attack(fireTarget) }
-        if ( repairTarget !== undefined ) { tower.repair(repairTarget)}
-        if ( healTarget !== undefined) { tower.heal(healTarget)}
-
-    }
-
-
-    function fFindTowers(fRoom) {
-        return Game.rooms[fRoom].find(FIND_STRUCTURES, {
-            filter: (f) => f.structureType === STRUCTURE_TOWER
-        })
-
-    }
-
+    towerLogic.run() // runs tower logic
+    linkLogic.run() // runs link logic
 // ---------------------------------------------------------------------------------------------------------------------
 // Minimum needed creeps for colony
     const miners = 2;
-    const upgraders = 2;
-    const builders = 0;
+    const upgraders = 1;
+    const builders = 1;
     const repairers = 0;
     const freighters = 1;
     const bridges = 1;
@@ -208,7 +161,7 @@ module.exports.loop = function () {
     switch (true) {
 
         case W1N6_Freighters < freighters:
-            Game.spawns.Spawn1.spawnMyCreep('freighter', 'W1N6')
+            Game.spawns.Spawn1_1.spawnMyCreep('freighter', 'W1N6')
             Memory.statistics.freighter += 1;
             break;
 
@@ -232,8 +185,6 @@ module.exports.loop = function () {
             Memory.statistics.repairers += 1;
             break;
 
-
-
         case W1N6_Bridges < bridges:
             Game.spawns.Spawn1.spawnMyCreep('bridge', 'W1N6')
             Memory.statistics.bridges += 1;
@@ -244,7 +195,7 @@ module.exports.loop = function () {
             Memory.statistics.wallRepairers += 1;
             break;
 
-        case W1N6_Claimers < 0:
+        case W1N6_Claimers < claimers:
             Game.spawns.Spawn1.spawnMyCreep('claimer', 'W1N6')
             Memory.statistics.claimers += 1;
             break;
@@ -255,17 +206,10 @@ module.exports.loop = function () {
             break;
 
         case W1N6_Panzers < panzers:
-            Game.spawns.Spawn1.spawnMyCreep('panzer', 'W1N6')
+            Game.spawns.Spawn1.spawnMyCreep('panzer', 'W1N6','E1N8')
             Memory.statistics.panzers += 1;
-            break;
-
-        case W1N7_Upgraders < 0:
-            Game.spawns.Spawn1.spawnMyCreep('upgrader', 'W1N7')
-            Memory.statistics.upgraders += 1;
-            break;
-        case W1N7_Builders < 0:
-            Game.spawns.Spawn1.spawnMyCreep('builder', 'W1N7')
-            Memory.statistics.builders += 1;
+            Game.spawns.Spawn1_1.spawnMyCreep('panzer', 'W1N6','E1N8')
+            Memory.statistics.panzers += 1;
             break;
 
         default:
@@ -282,24 +226,23 @@ module.exports.loop = function () {
             Memory.statistics.freighter += 1;
             break;
 
+        case W2N6_Bridges < bridges:
+            Game.spawns.Spawn2.spawnMyCreep('bridge', 'W2N6')
+            Memory.statistics.bridges += 1;
+            break;
+
         case W2N6_Miners < miners:
             spawnStatus = Game.spawns.Spawn2.spawnMyCreep('miner', 'W2N6')
             Memory.statistics.miners += 1;
             break;
 
 
-        case W2N6_Bridges < bridges:
-            Game.spawns.Spawn2.spawnMyCreep('bridge', 'W2N6')
-            Memory.statistics.bridges += 1;
-            break;
-
-
-        case W2N6_Upgraders < 4:
+        case W2N6_Upgraders < upgraders:
             Game.spawns.Spawn2.spawnMyCreep('upgrader', 'W2N6')
             Memory.statistics.upgraders += 1;
             break;
 
-        case W2N6_Builders < 2:
+        case W2N6_Builders < builders:
             Game.spawns.Spawn2.spawnMyCreep('builder', 'W2N6')
             Memory.statistics.builders += 1;
             break;
@@ -310,7 +253,7 @@ module.exports.loop = function () {
             break;
 
 
-        case W2N6_WallRepairers < 1:
+        case W2N6_WallRepairers < wallRepairers:
             Game.spawns.Spawn2.spawnMyCreep('wallRepairer', 'W2N6')
             Memory.statistics.wallRepairers += 1;
             break;
@@ -325,6 +268,11 @@ module.exports.loop = function () {
             Game.spawns.Spawn2.spawnMyCreep('scout', 'W2N6', 'W2N7')
             Memory.statistics.scouts += 1;
             break;
+        case W1N6_Panzers < panzers:
+            Game.spawns.Spawn2.spawnMyCreep('panzer', 'W1N6','E1N8')
+            Memory.statistics.panzers += 1;
+
+            break;
 
         default:
             break;
@@ -336,23 +284,23 @@ module.exports.loop = function () {
     switch (true) {
 
         case W1N7_Freighters < freighters:
-            Game.spawns.Spawn1_1.spawnMyCreep('freighter', 'W1N7')
+            Game.spawns.Spawn3.spawnMyCreep('freighter', 'W1N7')
             Memory.statistics.freighter += 1;
             break;
 
         case W1N7_Miners < miners:
-            spawnStatus = Game.spawns.Spawn1_1.spawnMyCreep('miner', 'W1N7')
+            spawnStatus = Game.spawns.Spawn3.spawnMyCreep('miner', 'W1N7')
             Memory.statistics.miners += 1;
             break;
 
 
-        case W1N7_Bridges < 4:
-            Game.spawns.Spawn1_1.spawnMyCreep('bridge', 'W1N7')
+        case W1N7_Bridges < bridges:
+            Game.spawns.Spawn3.spawnMyCreep('bridge', 'W1N7')
             Memory.statistics.bridges += 1;
             break;
 
 
-        case W1N7_Upgraders < 5:
+        case W1N7_Upgraders < upgraders:
             Game.spawns.Spawn3.spawnMyCreep('upgrader', 'W1N7')
             Memory.statistics.upgraders += 1;
             break;
@@ -368,7 +316,7 @@ module.exports.loop = function () {
             break;
 
 
-        case W1N7_WallRepairers < 2:
+        case W1N7_WallRepairers < wallRepairers:
             Game.spawns.Spawn3.spawnMyCreep('wallRepairer', 'W1N7')
             Memory.statistics.wallRepairers += 1;
             break;
@@ -384,59 +332,6 @@ module.exports.loop = function () {
 
 // ---------------------------------------------------------------------------------------------------------------------
 // Colony links logic
-
-    const linkFromFirstMine = Game.rooms['W1N6'].lookForAt('structure', 39,40 )[0];
-    const linkFromSecondMine = Game.rooms['W1N6'].lookForAt('structure', 44,28 )[0];
-    const linkToStorageW1N6 = Game.rooms['W1N6'].lookForAt('structure', 21, 17)[0];
-    const linkToUpgraderW1N6 = Game.rooms['W1N6'].lookForAt('structure', 17, 9)[0];
-
-    const linkFromFirstMineW2N6 = Game.rooms['W2N6'].lookForAt('structure', 4,13 )[0];
-    const linkFromSecondMineW2N6 = Game.rooms['W2N6'].lookForAt('structure', 45,28 )[0];
-    const linkToStorageW2N6 = Game.rooms['W2N6'].lookForAt('structure', 25, 29)[0];
-
-    let linkFromFirstMineEnergy = linkFromFirstMine.store[RESOURCE_ENERGY];
-    let linkFromSecondMineEnergy = linkFromSecondMine.store[RESOURCE_ENERGY];
-    let linkToStorageEnergy = linkToStorageW1N6.store[RESOURCE_ENERGY];
-    let linkToUpgraderEnergy = linkToUpgraderW1N6.store[RESOURCE_ENERGY];
-
-    let linkFromFirstMineEnergyW2N6 = linkFromFirstMineW2N6.store[RESOURCE_ENERGY];
-    let linkFromSecondMineEnergyW2N6 = linkFromSecondMineW2N6.store[RESOURCE_ENERGY];
-    let linkToStorageEnergyW2N6 = linkToStorageW2N6.store[RESOURCE_ENERGY];
-
-
-    switch (true) {
-
-        case linkToUpgraderEnergy === 0 && linkFromFirstMineEnergy === 800:
-            linkFromFirstMine.transferEnergy(linkToUpgraderW1N6);
-            break;
-
-        case linkToUpgraderEnergy === 0 && linkFromSecondMineEnergy === 800:
-            linkFromSecondMine.transferEnergy(linkToUpgraderW1N6);
-            break;
-
-        case linkToStorageEnergy === 0 && linkFromFirstMineEnergy === 800:
-            linkFromFirstMine.transferEnergy(linkToStorageW1N6);
-            break;
-
-        case linkToStorageEnergy === 0 && linkFromSecondMineEnergy === 800:
-            linkFromSecondMine.transferEnergy(linkToStorageW1N6);
-            break;
-
-
-        case linkToStorageEnergyW2N6 === 0 && linkFromFirstMineEnergyW2N6 === 800:
-            linkFromFirstMineW2N6.transferEnergy(linkToStorageW2N6);
-            break;
-
-        case linkToStorageEnergyW2N6 === 0 && linkFromSecondMineEnergyW2N6 === 800:
-            linkFromSecondMineW2N6.transferEnergy(linkToStorageW2N6);
-            break;
-
-
-        default:
-            break;
-    }
-
-
 
 // ---------------------------------------------------------------------------------------------------------------------
 // Functions for whole module
